@@ -1,0 +1,9 @@
+#!/bin/sh
+keyfile=/root/storage-key
+
+cryptsetup --key-file=$keyfile open /dev/disk/by-uuid/621c806b-6086-4ea8-a7ca-4cd113f306af storage-1
+cryptsetup --key-file=$keyfile open /dev/disk/by-uuid/7374d474-8942-43a7-92c2-f85c50288b69 storage-2
+cryptsetup --key-file=$keyfile open /dev/disk/by-uuid/9c4384b1-96d7-44ff-a366-03ebd47ff23a storage-3
+cryptsetup --key-file=$keyfile open /dev/disk/by-uuid/ed77adb9-2485-45e4-ba85-afaf94c5a591 storage-4
+
+mount /dev/mapper/storage-1 /mnt/storage

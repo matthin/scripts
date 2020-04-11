@@ -1,0 +1,22 @@
+#!/usr/bin/env fish
+
+##
+# btrfs_balance_time_left
+#
+# Shows a very rough estimate of how much longer a balance should take.
+# The longer the balance has been running, the more accurate this should be
+
+function time_since_start
+  set -l start_time (journalctl -k --output=short-monotonic | rg -r '$1' -o '\[(.+)\].+BTRFS.+balance' | tail -1)
+  set -l curr_time (awk '{print $1}' /proc/uptime)
+  echo (math $curr_time - $start_time)
+end
+
+function time_left
+  btrfs balance status /mnt/storage/ | tail -1 | awk '{print $1} {print $5}' | read -l -L blocks_done blocks_total
+  set -l time_per_block (math (time_since_start) / $blocks_done)
+  set -l total_time (math $time_per_block \* $blocks_total)
+  echo (math $total_time - (time_since_start))
+end
+
+echo (date -s (time_left)' seconds')

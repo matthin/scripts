@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+
+##
+# Usage: gitlab_archive_all username access_token
+
+require "bundler/inline"
+
+gemfile do
+  source "https://rubygems.org"
+  gem "gitlab", "~> 4.14"
+end
+
+Gitlab.endpoint = "https://gitlab.com/api/v4"
+Gitlab.private_token = ARGV[1]
+
+def archive(username, page: 0)
+  projects = Gitlab.user_projects(username, { page: page, per_page: 10 })
+
+  projects.map(&:to_h).each do |p|
+    next if p["archived"]
+    Gitlab.archive_project(p["id"])
+  end
+  
+  if projects.size == 10
+    archive(username, page: page + 1)
+  end
+end
+
+archive(ARGV[0])

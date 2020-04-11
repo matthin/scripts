@@ -1,0 +1,16 @@
+#!/usr/bin/env fish
+
+##
+# google_takeout
+#
+# Downloads google takeout archives.
+# Should probably be run once every week.
+
+if ! test (count $argv) -eq 2
+  echo 'usage: google_takeout $rclone_remote $out_dir'
+  exit 1
+end
+
+for archive in (rclone lsf $argv[1]:/Takeout/)
+  rclone move $argv[1]:/Takeout/$archive $argv[2]
+end
