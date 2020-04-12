@@ -1,0 +1,22 @@
+#!/usr/bin/env fish
+
+##
+# Usage: ./merge_videos /absolute/path/basename*.mp4
+#
+# Where /absolute/path/ contains:
+# * basenameA.mp4
+# * basenameB.mp4
+# * ...
+#
+# Will create an output file named /absolute/path/basenameA.mp4NEW.mkv
+
+set filelist /tmp/filelist
+set outfile "$argv[1]NEW.mkv"
+
+for v in $argv
+  echo "file '$v'" >> $filelist
+end
+
+ffmpeg -f concat -safe 0 -i $filelist -c copy $outfile
+
+rm $filelist
