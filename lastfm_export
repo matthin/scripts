@@ -1,0 +1,49 @@
+#!/usr/bin/env ruby
+
+##
+# Usage: ./lastfm_export API_KEY USER > lastfm_USER_(date -Iseconds).csv
+
+require "csv"
+require "json"
+require "net/http"
+
+API_KEY = ARGV[0]
+USER    = ARGV[1]
+
+def write_tracks(csv, page: 1)
+  uri = URI("http://ws.audioscrobbler.com/2.0/")
+  params = {
+    method: "user.getrecenttracks",
+    user: USER,
+    api_key: API_KEY,
+    format: "json",
+    limit: 200,
+    page: page,
+  }
+  uri.query = URI.encode_www_form(params)
+
+  res = Net::HTTP.get_response(uri)
+  data = JSON.parse(res.body)
+
+  data["recenttracks"]["track"].each do |track|
+    # @attr should only exist if the track is currently being played.
+    # Currently played songs don't have a timestamp, thus we skip.
+    next if track["@attr"]
+
+    csv << [
+      track["artist"]["#text"],
+      track["album"]["#text"],
+      track["name"],
+      track["date"]["uts"]
+    ]
+  end
+
+  if data["recenttracks"]["@attr"]["totalPages"] != page.to_s
+    sleep 1
+
+    write_tracks(csv, page: page + 1)
+  end
+end
+
+headers = ["artist", "album", "title", "timestamp"]
+CSV($stdout, write_headers: true, headers: headers) { |csv| write_tracks(csv) }
