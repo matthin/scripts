@@ -1,7 +1,0 @@
-#!/bin/sh
-umount /mnt/storage
-
-cryptsetup close /dev/mapper/storage-1
-cryptsetup close /dev/mapper/storage-2
-cryptsetup close /dev/mapper/storage-3
-cryptsetup close /dev/mapper/storage-4
