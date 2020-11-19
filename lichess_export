@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+
+##
+# Usage: ./lichess_export USER > lichess_USER_(date -Iseconds).txt
+
+require "net/http"
+
+USER = ARGV[0]
+
+uri = URI("https://lichess.org/api/games/user/#{USER}")
+req = Net::HTTP::Get.new(uri, {
+  "Accept" => "application/x-ndjson"
+})
+http = Net::HTTP.new(uri.hostname, uri.port)
+http.use_ssl = true
+res = http.start { |h| h.request(req) }
+puts res.body
