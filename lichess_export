@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 ##
-# Usage: ./lichess_export USER > lichess_USER_(date -Iseconds).txt
+# Usage: ./lichess_export USER > lichess_USER_(date -Iseconds).ndjson
 
 require "net/http"
 
