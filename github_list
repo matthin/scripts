@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+
+##
+# Usage: ./github_list USERNAME
+#
+# The purpose of this script is to list all of a user's repositories in order
+# of creation date, along with every year each repository has commits for.
+# It's very easy to hit Github's unauthenticated rate limit, but I can run the
+# script once with my own account, so it's good enough for me as of now.
+
+require "bundler/inline"
+require "date"
+
+gemfile do
+  source "https://rubygems.org"
+  gem "octokit", "~> 4.0"
+end
+
+USER = ARGV[0]
+
+def projects
+  client = Octokit::Client.new(per_page: 100)
+  client.auto_paginate = true
+
+  repos = client.repositories(USER).sort_by { |repo| repo["created_at"] }
+  repos.map do |repo|
+    commits = client.commits(repo["full_name"]).map do |entry|
+      entry["commit"]
+    end
+    years = commits.map { |c| c["author"]["date"].year }.uniq.reverse
+
+    {
+      title: repo["name"],
+      years: years
+    }
+  end
+end
+
+puts projects
