@@ -1,0 +1,5 @@
+#!/usr/bin/env fish
+set datetime (date +'%Y-%m-%d-%H%M%S')
+grim /tmp/screenshot_$datetime.png
+cwebp /tmp/screenshot_$datetime.png -mt -z 9 -o $argv[1]/$datetime.webp
+rm /tmp/screenshot_$datetime.png
